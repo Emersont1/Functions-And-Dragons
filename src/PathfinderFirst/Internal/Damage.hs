@@ -26,12 +26,12 @@ data Damage
       { damageType :: DamageType,
         amount :: Dice
       }
-  | OngoingDamage
-      { damageType :: DamageType,
-        amount :: Dice,
-        save :: Integer,
-        skill :: Defence
-      }
+--  | OngoingDamage
+--      { damageType :: DamageType,
+--        amount :: Dice,
+--        save :: Integer,
+--        skill :: Defence
+--      }
   deriving (Show, Eq)
 
 data DamageTrait

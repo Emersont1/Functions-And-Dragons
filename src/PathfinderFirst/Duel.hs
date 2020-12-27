@@ -1,5 +1,6 @@
 module PathfinderFirst.Duel where
 
+import Data.Ratio
 import Dice
 import PathfinderFirst.Internal
 import Roll
@@ -42,26 +43,34 @@ flipDuel FLost = FWon
 flipDuel BothDead = BothDead
 flipDuel (OngoingDuel x y z) = OngoingDuel y x $invert z
 
-doDamage :: Integer -> Entity -> attack -> Entity
-doDamage roll x att = doDamage' (tail $damage att) x
-
-doDamage' :: [Damage] -> Entity -> Entity
-doDamage' [] x = x
-doDamage' dam:ds x = dealDamage x 
-
-damageValue :: Attack -> Entity -> Dice -> Rolls Entity
-damageValue attack x dmg =
+doDamage :: Integer -> Entity -> Attack -> Rolls Entity
+doDamage roll x att =
   fmap
-    ( \(roll, dam) ->
-        if (roll + modifier attack) < (ac (defences x))
-          then doDamage roll x attack
-          else x
+    ( \atk ->
+        doDamage' (tail atk) y
     )
-    (mix (1 `d` 20) dmg)
+    (_combs $map amount $ damage att)
+  where
+    y = x
+
+doDamage' :: [Integer] -> Entity -> Entity
+doDamage' [] x = x
+doDamage' (dam : ds) x = doDamage' ds $dealDamage x dam
+
+damageValue :: Attack -> Entity -> Rolls Entity
+damageValue attack x =
+  simplify $ flatten $ fmap
+    ( \roll ->
+        if (roll + modifier attack) < ac (defences $getEnt x)
+          then doDamage roll x attack
+          else Rolls [Roll x ((%) 1 1)]
+    )
+    (1 `d` 20)
 
 stepDuel :: DuelState -> Rolls DuelState
 stepDuel (OngoingDuel x y s)
-  | s == First = fmap \(dam -> OngoingDuel x y  Second )  (damageValue (modifier _attack) (ac(defences y)) ( damage _attack))
-      where _attack = head $attacks x
+  | s == First = fmap (\ydam -> OngoingDuel x ydam Second) (damageValue _attack y)
   | s == Second = fmap flipDuel $stepDuel $ OngoingDuel y x First
+  where
+    _attack = head $attacks $getEnt x
 stepDuel x = Rolls [Roll x ((%) 1 1)]
