@@ -1,21 +1,14 @@
-module Entity.Internal where
+module PathfinderFirst.Internal.Entity where
 
-import Dice
+import PathfinderFirst.Internal.Attack
+import PathfinderFirst.Internal.Defences
 
-data Attack = Attack
-  { attackName :: String,
-    modifier :: Integer,
-    damage :: Dice,
-    -- Roll value (without mods) that if higher its a crit
-    crit :: Integer
-  }
-  deriving (Show, Eq)
 
 data Ent = Entity
   { entityName :: String,
     hp :: Integer,
     maxHP :: Integer,
-    ac :: Integer,
+    defences :: Defences,
     initiative :: Integer,
     attacks :: [Attack]
   }
