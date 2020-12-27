@@ -1,10 +1,11 @@
-module PathfinderFirst.Internal.DamageTypes where
+module PathfinderFirst.Internal.Damage where
 
 import Dice
 import PathfinderFirst.Internal.Defences
 
 data DamageType
-  = Slashing
+  = None
+  | Slashing
   | Bludgeoning
   | Piercing
   | Fire
@@ -17,6 +18,7 @@ data DamageType
   | Psychic
   | Force
   | Acid
+  | ElementalTraits -- Not sure what this is
   deriving (Show, Eq)
 
 data Damage
@@ -24,10 +26,16 @@ data Damage
       { damageType :: DamageType,
         amount :: Dice
       }
-  | Ongoing
+  | OngoingDamage
       { damageType :: DamageType,
         amount :: Dice,
         save :: Integer,
         skill :: Defence
       }
   deriving (Show, Eq)
+
+data DamageTrait
+  = Immune DamageType
+  | Resistance DamageType Integer
+  | Weakness DamageType
+  deriving(Show, Eq)

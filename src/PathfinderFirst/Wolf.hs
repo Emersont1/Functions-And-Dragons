@@ -18,7 +18,8 @@ wolfInternal e =
               will = 1
             },
         initiative = 2,
-        attacks = [Attack {attackName = "Bite", modifier = 2, damage = 1 `d` 6 `p` 1, crit = 20, critMultiplier = 2}]
+        attacks = [Attack {attackName = "Bite", modifier = 2, damage = [OneOff None $ 1 `d` 6 `p` 1], crit = 20, critMultiplier = 2}],
+        damageTraits = []
       }
 
 wolf = fmap wolfInternal $ 2 `d` 8 `p` 4
