@@ -1,7 +1,7 @@
 module Roll (Rolls (Rolls), uniqueValues, probability, maxValue, minValue, simplify, mix, mixFmap, fmapSimplify) where
 
-import Roll.Internal
 import Data.List
+import Roll.Internal
 
 -- It requires Eq for equality when attacks list damage
 newtype Rolls a = Rolls [Roll a] deriving (Eq)
@@ -10,7 +10,7 @@ instance Functor Rolls where
   fmap f (Rolls xs) = Rolls $ map (\(Roll x y) -> Roll (f x) y) xs
 
 instance Show a => Show (Rolls a) where
-    show (Rolls xs) = "(" ++ intercalate ", " (map show  xs)++ ")"
+  show (Rolls xs) = "(" ++ intercalate ", " (map show xs) ++ ")"
 
 uniqueValues :: (Eq a) => Rolls a -> [a]
 uniqueValues (Rolls rs) = nub $ map _val rs
@@ -41,4 +41,3 @@ mixFmap f xs ys = fmap (uncurry f) (mix xs ys)
 
 fmapSimplify :: Eq b => (a -> b) -> Rolls a -> Rolls b
 fmapSimplify f xs = simplify $ fmap f xs
-
