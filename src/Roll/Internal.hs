@@ -1,6 +1,6 @@
 module Roll.Internal where
 
-data Roll a = Roll a Rational
+data Roll a = Roll a Rational deriving(Eq)
 
 instance Show a => Show (Roll a) where
     show (Roll v p) = "("++ show v ++", "++ show p++")"

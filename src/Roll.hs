@@ -3,7 +3,8 @@ module Roll (Rolls (Rolls), uniqueValues, probability, maxValue, minValue, simpl
 import Roll.Internal
 import Data.List
 
-newtype Rolls a = Rolls [Roll a]
+-- It requires Eq for equality when attacks list damage
+newtype Rolls a = Rolls [Roll a] deriving (Eq)
 
 instance Functor Rolls where
   fmap f (Rolls xs) = Rolls $ map (\(Roll x y) -> Roll (f x) y) xs
