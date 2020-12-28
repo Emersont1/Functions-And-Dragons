@@ -1,4 +1,4 @@
-module PathfinderFirst.SmallLightningElemental (smallLightningElemental) where
+module PathfinderFirst.SmallLightningElemental (smallLightningElemental, averageSmallLightningElemental) where
 
 import Dice
 import PathfinderFirst.Internal
@@ -23,3 +23,4 @@ smallLightningElementalInternal e =
       }
 
 smallLightningElemental = fmap smallLightningElementalInternal $ 2 `d` 10
+averageSmallLightningElemental = fmap smallLightningElementalInternal $ 11 `d` 1
