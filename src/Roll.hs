@@ -1,6 +1,7 @@
-module Roll (Rolls (Rolls), uniqueValues, probability, maxValue, minValue, simplify, mix, mixFmap, fmapSimplify, flatten, normalise) where
+module Roll (Rolls (Rolls), simplify, mix, mixFmap, fmapSimplify, flatten, normalise, constant) where
 
 import Data.List
+import Data.Ratio
 import Roll.Internal
 
 -- It requires Eq for equality when attacks list damage
@@ -12,26 +13,27 @@ instance Functor Rolls where
 instance Show a => Show (Rolls a) where
   show (Rolls xs) = "(" ++ intercalate ", " (map show xs) ++ ")"
 
-uniqueValues :: (Eq a) => Rolls a -> [a]
-uniqueValues (Rolls rs) = nub $ map _val rs
+--uniqueValues :: (Eq a) => Rolls a -> [a]
+--uniqueValues (Rolls rs) = nub $ map _val rs
 
-probability :: (Eq a) => Rolls a -> a -> Rational
-probability (Rolls rs) v = sum $ map _prob $ filter (\x -> v == _val x) rs
+--probability :: (Eq a) => Rolls a -> a -> Rational
+--probability (Rolls rs) v = sum $ map _prob $ filter (\x -> v == _val x) rs
 
-maxValue :: (Ord a) => Rolls a -> a
-maxValue (Rolls rs) = maximum $ map _val rs
+--maxValue :: (Ord a) => Rolls a -> a
+--maxValue (Rolls rs) = maximum $ map _val rs
 
-minValue :: (Ord a) => Rolls a -> a
-minValue (Rolls rs) = minimum $ map _val rs
+--minValue :: (Ord a) => Rolls a -> a
+--minValue (Rolls rs) = minimum $ map _val rs
 
 simplify :: (Eq a) => Rolls a -> Rolls a
-simplify rs =
-  Rolls $
-    map
-      ( \r ->
-          Roll r $ probability rs r
-      )
-      $ uniqueValues rs
+simplifyInternal v p f [] =  Roll v p :f
+simplifyInternal v p f s = (addp (head s):f)++tail s
+  where addp (Roll v2 p2) = Roll v2 (p+p2)
+  
+simplify (Rolls rs) = Rolls $ foldr (\(Roll v p)  rolls -> let (f, s) = spl v rolls in simplifyInternal v p f s) [] rs 
+  where spl v = break (\(Roll r p) -> r == v)
+        
+
 
 mix :: Rolls a -> Rolls b -> Rolls (a, b)
 mix (Rolls xs) (Rolls ys) =
@@ -58,10 +60,16 @@ fmapSimplify f xs = simplify $ fmap f xs
 
 -- last 2 functions designed for infinite loop avoidance
 
-flatten :: Rolls (Rolls a) -> Rolls a
-flatten (Rolls x) = Rolls $ concatMap (\(Roll (Rolls vs) p1) -> map (\(Roll u p2) -> Roll u $p1 * p2) vs) x
+flatten :: Eq a => Rolls (Rolls a) -> Rolls a
+--flatten' (Rolls x) = Rolls $ concatMap (\(Roll (Rolls vs) p1) -> map (\(Roll u p2) -> Roll u $p1 * p2) vs) x
+
+flatten (Rolls x) = Rolls (foldr (\(Roll (Rolls u) p2) v -> foldr  (\(Roll v p)  rolls -> let (f, s) = spl v rolls in simplifyInternal v (p*p2) f s) v u) [] x)
+  where spl v = break (\(Roll r p) -> r == v)
 
 normalise :: Rolls a -> Rolls a
 normalise (Rolls xs) = Rolls $ map (\(Roll v p) -> Roll v (p / pSum)) xs
   where
     pSum = sum $map (\(Roll v p) -> p) xs
+
+constant :: a -> Rolls a
+constant e =  Rolls [Roll e (1%1)]

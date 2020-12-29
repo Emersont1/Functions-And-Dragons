@@ -36,6 +36,7 @@ update x
   | otherwise = Dead x
 -- hp x + constitution ( stats x) > 0 = Unconsious x
 
+-- TODO: Add resistances
 dealDamage :: Entity -> Integer -> Entity
 dealDamage (Dead x) _ = Dead x
 dealDamage (Unconscious x) dam= update x {hp = hp x -dam }

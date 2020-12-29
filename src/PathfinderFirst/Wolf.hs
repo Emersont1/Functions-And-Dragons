@@ -1,5 +1,6 @@
 module PathfinderFirst.Wolf (wolf, averageWolf) where
 
+import Roll
 import Dice
 import PathfinderFirst.Internal
 
@@ -23,4 +24,4 @@ wolfInternal e =
       }
 
 wolf = fmap wolfInternal $ 2 `d` 8 `p` 4
-averageWolf = fmap wolfInternal $ 13 `d` 1
+averageWolf = constant $ wolfInternal 13

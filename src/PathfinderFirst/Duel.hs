@@ -11,7 +11,7 @@ data NextMove = First | Second deriving (Eq, Show)
 invert First = Second
 invert Second = Second
 
-data DuelState = OngoingDuel Entity Entity NextMove | FWon | FLost | BothDead deriving (Eq, Show)
+data DuelState = OngoingDuel Entity Entity NextMove | FWon | FLost | BothDead | Unfinished deriving (Eq, Show) 
 
 inititiveOrderInternal :: Integer -> Integer -> Integer -> Integer -> [NextMove]
 inititiveOrderInternal xinit yinit x y
@@ -38,39 +38,51 @@ duelInternal a b = fmap (OngoingDuel a b) (initiativeOrder a b)
 duel :: Rolls Entity -> Rolls Entity -> Rolls DuelState
 duel a b = flatten $ fmap (uncurry duelInternal) $mix a b
 
+flipDuel :: DuelState -> DuelState
 flipDuel FWon = FLost
 flipDuel FLost = FWon
 flipDuel BothDead = BothDead
 flipDuel (OngoingDuel x y z) = OngoingDuel y x $invert z
 
-doDamage :: Integer -> Entity -> Attack -> Rolls Entity
-doDamage roll x att =
-  fmap
-    ( \atk ->
-        doDamage' (tail atk) y
-    )
-    (_combs $map amount $ damage att)
-  where
-    y = x
+attack' :: [Damage] -> Entity -> Rolls Entity
+attack' [] e = constant e
+attack' (d:ds) e = fmap (uncurry dealDamage) (mix (attack' ds e) (amount d))
 
-doDamage' :: [Integer] -> Entity -> Entity
-doDamage' [] x = x
-doDamage' (dam : ds) x = doDamage' ds $dealDamage x dam
+attackRoll :: Attack -> Entity -> Integer -> Rolls Entity
+attackRoll at e r
+  | r > crit at = attack' (head (damage at):damage at) e 
+  | r + modifier at > ac (defences (getEnt e)) = attack' (head (damage at):damage at) e 
+  | otherwise = Rolls [Roll e (1%1)] 
 
 damageValue :: Attack -> Entity -> Rolls Entity
-damageValue attack x =
-  simplify $ flatten $ fmap
-    ( \roll ->
-        if (roll + modifier attack) < ac (defences $getEnt x)
-          then doDamage roll x attack
-          else Rolls [Roll x ((%) 1 1)]
-    )
-    (1 `d` 20)
+damageValue at e = flatten $ fmap (attackRoll at e) (1`d`20)
 
-stepDuel :: DuelState -> Rolls DuelState
-stepDuel (OngoingDuel x y s)
-  | s == First = fmap (\ydam -> OngoingDuel x ydam Second) (damageValue _attack y)
-  | s == Second = fmap flipDuel $stepDuel $ OngoingDuel y x First
+
+stepDuel :: Rolls DuelState -> Rolls DuelState
+stepDuel ds = flatten $! fmap stepDuel' ds
+
+postAttack :: DuelState -> DuelState
+postAttack (OngoingDuel (Conscious x) (Dead y) s) = FWon
+postAttack (OngoingDuel (Dead x) (Conscious y) s) = FLost
+postAttack (OngoingDuel (Dead x) (Dead y) s) = FLost
+postAttack x = x
+
+stepDuel' :: DuelState -> Rolls DuelState
+stepDuel' (OngoingDuel x y s)
+  | s == First =  fmap (\ydam -> postAttack $ OngoingDuel x ydam Second) (damageValue xAttack y)
+  | s == Second = fmap (\xdam -> postAttack $ OngoingDuel xdam y First) (damageValue yAttack x)
   where
-    _attack = head $attacks $getEnt x
-stepDuel x = Rolls [Roll x ((%) 1 1)]
+    yAttack = head $attacks $getEnt y
+    xAttack = head $attacks $getEnt x
+stepDuel' x = constant x
+
+lastRound :: DuelState -> DuelState
+lastRound OngoingDuel {} = Unfinished
+lastRound x = x
+
+findWinner :: Integer -> Rolls DuelState -> Rolls DuelState
+findWinner n duel = simplify $ fmap  lastRound (findWinner' n duel)
+
+findWinner' :: Integer -> Rolls DuelState -> Rolls DuelState
+findWinner' 0 duel = duel
+findWinner' x duel = uncurry findWinner'  (x-1 , stepDuel duel)
