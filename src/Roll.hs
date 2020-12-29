@@ -1,4 +1,4 @@
-module Roll (Rolls (Rolls), simplify, mix, mixFmap, fmapSimplify, flatten, normalise, constant) where
+module Roll (Rolls (Rolls), simplify, mix, mixFmap, fmapSimplify, flatten, normalise, constant, fmapFlatten) where
 
 import Data.List
 import Data.Ratio
@@ -56,7 +56,12 @@ mixFmap :: (a -> b -> c) -> Rolls a -> Rolls b -> Rolls c
 mixFmap f xs ys = fmap (uncurry f) (mix xs ys)
 
 fmapSimplify :: Eq b => (a -> b) -> Rolls a -> Rolls b
-fmapSimplify f xs = simplify $ fmap f xs
+fmapSimplify g (Rolls rs) = Rolls $ foldr (\(Roll v p)  rolls -> 
+  let h = g v
+      (f, s) = spl h rolls 
+  
+  in simplifyInternal h p f s) [] rs 
+  where spl v = break (\(Roll r p) -> r == v)
 
 -- last 2 functions designed for infinite loop avoidance
 
@@ -65,6 +70,14 @@ flatten :: Eq a => Rolls (Rolls a) -> Rolls a
 
 flatten (Rolls x) = Rolls (foldr (\(Roll (Rolls u) p2) v -> foldr  (\(Roll v p)  rolls -> let (f, s) = spl v rolls in simplifyInternal v (p*p2) f s) v u) [] x)
   where spl v = break (\(Roll r p) -> r == v)
+
+fmapFlatten :: Eq b => (a -> b) -> Rolls (Rolls a) -> Rolls b
+fmapFlatten g (Rolls x) = Rolls (foldr (\(Roll (Rolls u) p2) acc -> foldr  (\(Roll v p)  rolls ->
+  let h = g v
+      (f, s) = spl h rolls
+  in simplifyInternal h (p*p2) f s) acc u) [] x)
+  where spl v = break (\(Roll r p) -> r == v)
+
 
 normalise :: Rolls a -> Rolls a
 normalise (Rolls xs) = Rolls $ map (\(Roll v p) -> Roll v (p / pSum)) xs

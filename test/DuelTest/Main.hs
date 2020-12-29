@@ -3,4 +3,4 @@ import PathfinderFirst.Wolf
 import PathfinderFirst.SmallLightningElemental
 
 main :: IO()
-main = putStrLn $ show $! findWinner 100 $ duel averageSmallLightningElemental averageWolf 
+main = putStrLn $ show $! findWinner 5 $ duel smallLightningElemental wolf 
