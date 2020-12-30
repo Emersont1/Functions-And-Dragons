@@ -21,10 +21,14 @@ data DamageType
   | ElementalTraits -- Not sure what this is
   deriving (Show, Eq)
 
+data DiceValue = DiceValue Int Int Int deriving(Eq, Show)
+diceValue :: DiceValue -> Dice
+diceValue (DiceValue n x v) = n`d`x`p`v
+
 data Damage
   = OneOff
       { damageType :: DamageType,
-        amount :: Dice
+        amount :: DiceValue
       }
 --  | OngoingDamage
 --      { damageType :: DamageType,

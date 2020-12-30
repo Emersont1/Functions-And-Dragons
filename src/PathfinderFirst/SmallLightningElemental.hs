@@ -4,7 +4,7 @@ import Roll
 import Dice
 import PathfinderFirst.Internal
 
-smallLightningElementalInternal :: Integer -> Entity
+smallLightningElementalInternal :: Int -> Entity
 smallLightningElementalInternal e =
   Conscious $
     Entity
@@ -19,9 +19,18 @@ smallLightningElementalInternal e =
               will = 10
             },
         initiative = 6,
-        attacks = [Attack {attackName = "Slam", modifier = 5, damage = [OneOff None $ 1 `d` 4, OneOff Electricity $ 1 `d` 3], crit = 20, critMultiplier = 2}],
+        attacks =
+          [ Attack
+              { attackName = "Slam",
+                modifier = 5,
+                damage = [OneOff None $ DiceValue 1 4 0, OneOff Electricity $ DiceValue 1 3 0],
+                crit = 20,
+                critMultiplier = 2
+              }
+          ],
         damageTraits = [Immune Electricity, Immune ElementalTraits]
       }
 
 smallLightningElemental = fmap smallLightningElementalInternal $ 2 `d` 10
+
 averageSmallLightningElemental = constant $ smallLightningElementalInternal 11

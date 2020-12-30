@@ -48,3 +48,14 @@ tests:
     - -O3
     dependencies:
     - Functions-And-Dragons
+
+  Functions-And-Dragons-Duel-Test-Rejig:
+    main:                Main.hs
+    source-dirs:         test/DuelTestRejig
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    - -O3
+    dependencies:
+    - Functions-And-Dragons

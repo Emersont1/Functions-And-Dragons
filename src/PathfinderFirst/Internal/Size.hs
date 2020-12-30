@@ -13,7 +13,7 @@ data Size
   | Gargantuan Shape
   | Colossal Shape
 
-sizeModifier :: Size -> Integer
+sizeModifier :: Size -> Int
 sizeModifier Fine = 8
 sizeModifier Diminuitive = 4
 sizeModifier Tiny = 2
@@ -24,10 +24,10 @@ sizeModifier (Huge _) = -2
 sizeModifier (Gargantuan _) = -4
 sizeModifier (Colossal _) = -8
 
-specialSizeModifier :: Size -> Integer
+specialSizeModifier :: Size -> Int
 specialSizeModifier x = negate $ sizeModifier x
 
-flySizeModifier :: Size -> Integer
+flySizeModifier :: Size -> Int
 flySizeModifier Fine = 8
 flySizeModifier Diminuitive = 6
 flySizeModifier Tiny = 4
@@ -38,7 +38,7 @@ flySizeModifier (Huge _) = -4
 flySizeModifier (Gargantuan _) = -6
 flySizeModifier (Colossal _) = -8
 
-stealthSizeModifier :: Size -> Integer
+stealthSizeModifier :: Size -> Int
 stealthSizeModifier Fine = 16
 stealthSizeModifier Diminuitive = 12
 stealthSizeModifier Tiny = 8

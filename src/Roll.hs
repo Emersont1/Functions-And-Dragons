@@ -8,7 +8,7 @@ import Roll.Internal
 newtype Rolls a = Rolls [Roll a] deriving (Eq)
 
 instance Functor Rolls where
-  fmap f (Rolls xs) = Rolls $ map (\(Roll x y) -> Roll (f x) y) xs
+  fmap f (Rolls xs) = Rolls $! map (\(Roll x y) -> Roll (f x) y) xs
 
 instance Show a => Show (Rolls a) where
   show (Rolls xs) = "(" ++ intercalate ", " (map show xs) ++ ")"
@@ -30,14 +30,14 @@ simplifyInternal v p f [] =  Roll v p :f
 simplifyInternal v p f s = (addp (head s):f)++tail s
   where addp (Roll v2 p2) = Roll v2 (p+p2)
   
-simplify (Rolls rs) = Rolls $ foldr (\(Roll v p)  rolls -> let (f, s) = spl v rolls in simplifyInternal v p f s) [] rs 
+simplify (Rolls rs) = Rolls $ foldl' (\rolls (Roll v p) -> let (f, s) = spl v rolls in simplifyInternal v p f s) [] rs 
   where spl v = break (\(Roll r p) -> r == v)
         
 
 
 mix :: Rolls a -> Rolls b -> Rolls (a, b)
 mix (Rolls xs) (Rolls ys) =
-  Rolls
+  Rolls$!
     [ Roll (xv, yv) $xp * yp
       | (Roll xv xp) <- xs,
         (Roll yv yp) <- ys
@@ -56,7 +56,7 @@ mixFmap :: (a -> b -> c) -> Rolls a -> Rolls b -> Rolls c
 mixFmap f xs ys = fmap (uncurry f) (mix xs ys)
 
 fmapSimplify :: Eq b => (a -> b) -> Rolls a -> Rolls b
-fmapSimplify g (Rolls rs) = Rolls $ foldr (\(Roll v p)  rolls -> 
+fmapSimplify g (Rolls rs) = Rolls $ foldl' (\rolls (Roll v p) -> 
   let h = g v
       (f, s) = spl h rolls 
   
@@ -68,11 +68,11 @@ fmapSimplify g (Rolls rs) = Rolls $ foldr (\(Roll v p)  rolls ->
 flatten :: Eq a => Rolls (Rolls a) -> Rolls a
 --flatten' (Rolls x) = Rolls $ concatMap (\(Roll (Rolls vs) p1) -> map (\(Roll u p2) -> Roll u $p1 * p2) vs) x
 
-flatten (Rolls x) = Rolls (foldr (\(Roll (Rolls u) p2) v -> foldr  (\(Roll v p)  rolls -> let (f, s) = spl v rolls in simplifyInternal v (p*p2) f s) v u) [] x)
+flatten (Rolls x) = Rolls (foldl' (\v (Roll (Rolls u) p2) -> foldl'  (\rolls (Roll v p) -> let (f, s) = spl v rolls in simplifyInternal v (p*p2) f s) v u) [] x)
   where spl v = break (\(Roll r p) -> r == v)
 
 fmapFlatten :: Eq b => (a -> b) -> Rolls (Rolls a) -> Rolls b
-fmapFlatten g (Rolls x) = Rolls (foldr (\(Roll (Rolls u) p2) acc -> foldr  (\(Roll v p)  rolls ->
+fmapFlatten g (Rolls x) = Rolls (foldl' (\acc (Roll (Rolls u) p2) -> foldl'  (\rolls (Roll v p) ->
   let h = g v
       (f, s) = spl h rolls
   in simplifyInternal h (p*p2) f s) acc u) [] x)

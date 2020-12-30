@@ -7,10 +7,10 @@ import PathfinderFirst.Internal.Defences
 
 data Ent = Entity
   { entityName :: String,
-    hp :: Integer,
-    maxHP :: Integer,
+    hp :: Int,
+    maxHP :: Int,
     defences :: Defences,
-    initiative :: Integer,
+    initiative :: Int,
     attacks :: [Attack],
     damageTraits :: [DamageTrait]
   }
@@ -32,12 +32,12 @@ getEnt (Unconscious a) = a
 update :: Ent -> Entity
 update x
   | hp x > 0 = Conscious x
-  | False =  Unconscious x 
+  | False =  Unconscious x
   | otherwise = Dead x
 -- hp x + constitution ( stats x) > 0 = Unconsious x
 
 -- TODO: Add resistances
-dealDamage :: Entity -> Integer -> Entity
+dealDamage :: Entity -> Int -> Entity
 dealDamage (Dead x) _ = Dead x
 dealDamage (Unconscious x) dam= update x {hp = hp x -dam }
 dealDamage (Conscious x) dam= update x {hp = hp x -dam }
