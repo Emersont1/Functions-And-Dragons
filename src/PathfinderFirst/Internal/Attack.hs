@@ -3,12 +3,12 @@ import Dice
 import PathfinderFirst.Internal.Damage
 
 data Attack = Attack
-  { attackName :: String,
-    modifier :: Int,
-    damage :: [Damage],
+  { attackName     :: String,
+    modifier       :: Int,
+    damage         :: [Damage],
     -- Roll value (without mods) that if higher its a crit.
     -- Example: 19-20x2 would be crit = 19, critMultiplier = 2
-    crit :: Int,
+    crit           :: Int,
     -- Only applies to the first damage
     critMultiplier :: Int
   }

@@ -6,12 +6,12 @@ import PathfinderFirst.Internal.Defences
 
 
 data Ent = Entity
-  { entityName :: String,
-    hp :: Int,
-    maxHP :: Int,
-    defences :: Defences,
-    initiative :: Int,
-    attacks :: [Attack],
+  { entityName   :: String,
+    hp           :: Int,
+    maxHP        :: Int,
+    defences     :: Defences,
+    initiative   :: Int,
+    attacks      :: [Attack],
     damageTraits :: [DamageTrait]
   }
   deriving (Show, Eq)
@@ -19,13 +19,13 @@ data Ent = Entity
 data Entity = Dead Ent | Conscious Ent | Unconscious Ent deriving (Show, Eq)
 
 extendedRest :: Entity -> Entity
-extendedRest (Dead e) = Dead e
-extendedRest (Conscious e) = Conscious $e {hp = maxHP e}
+extendedRest (Dead e)        = Dead e
+extendedRest (Conscious e)   = Conscious $e {hp = maxHP e}
 extendedRest (Unconscious e) = Conscious $e {hp = maxHP e}
 
 getEnt :: Entity-> Ent
-getEnt (Dead a) = a
-getEnt (Conscious a) = a
+getEnt (Dead a)        = a
+getEnt (Conscious a)   = a
 getEnt (Unconscious a) = a
 
 
@@ -38,6 +38,6 @@ update x
 
 -- TODO: Add resistances
 dealDamage :: Entity -> Int -> Entity
-dealDamage (Dead x) _ = Dead x
-dealDamage (Unconscious x) dam= update x {hp = hp x -dam }
-dealDamage (Conscious x) dam= update x {hp = hp x -dam }
+dealDamage (Dead x) _          = Dead x
+dealDamage (Unconscious x) dam=update x {hp = hp x -dam }
+dealDamage (Conscious x) dam=  update x {hp = hp x -dam }

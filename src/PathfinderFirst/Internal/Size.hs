@@ -14,37 +14,37 @@ data Size
   | Colossal Shape
 
 sizeModifier :: Size -> Int
-sizeModifier Fine = 8
-sizeModifier Diminuitive = 4
-sizeModifier Tiny = 2
-sizeModifier Small = 1
-sizeModifier Medium = 0
-sizeModifier (Large _) = -1
-sizeModifier (Huge _) = -2
+sizeModifier Fine           = 8
+sizeModifier Diminuitive    = 4
+sizeModifier Tiny           = 2
+sizeModifier Small          = 1
+sizeModifier Medium         = 0
+sizeModifier (Large _)      = -1
+sizeModifier (Huge _)       = -2
 sizeModifier (Gargantuan _) = -4
-sizeModifier (Colossal _) = -8
+sizeModifier (Colossal _)   = -8
 
 specialSizeModifier :: Size -> Int
 specialSizeModifier x = negate $ sizeModifier x
 
 flySizeModifier :: Size -> Int
-flySizeModifier Fine = 8
-flySizeModifier Diminuitive = 6
-flySizeModifier Tiny = 4
-flySizeModifier Small = 2
-flySizeModifier Medium = 0
-flySizeModifier (Large _) = -2
-flySizeModifier (Huge _) = -4
+flySizeModifier Fine           = 8
+flySizeModifier Diminuitive    = 6
+flySizeModifier Tiny           = 4
+flySizeModifier Small          = 2
+flySizeModifier Medium         = 0
+flySizeModifier (Large _)      = -2
+flySizeModifier (Huge _)       = -4
 flySizeModifier (Gargantuan _) = -6
-flySizeModifier (Colossal _) = -8
+flySizeModifier (Colossal _)   = -8
 
 stealthSizeModifier :: Size -> Int
-stealthSizeModifier Fine = 16
-stealthSizeModifier Diminuitive = 12
-stealthSizeModifier Tiny = 8
-stealthSizeModifier Small = 4
-stealthSizeModifier Medium = 0
-stealthSizeModifier (Large _) = -4
-stealthSizeModifier (Huge _) = -8
+stealthSizeModifier Fine           = 16
+stealthSizeModifier Diminuitive    = 12
+stealthSizeModifier Tiny           = 8
+stealthSizeModifier Small          = 4
+stealthSizeModifier Medium         = 0
+stealthSizeModifier (Large _)      = -4
+stealthSizeModifier (Huge _)       = -8
 stealthSizeModifier (Gargantuan _) = -12
-stealthSizeModifier (Colossal _) = -16
+stealthSizeModifier (Colossal _)   = -16

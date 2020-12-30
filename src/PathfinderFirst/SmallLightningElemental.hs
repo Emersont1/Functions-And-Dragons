@@ -1,8 +1,8 @@
 module PathfinderFirst.SmallLightningElemental (smallLightningElemental, averageSmallLightningElemental) where
 
-import Roll
 import Dice
 import PathfinderFirst.Internal
+import Roll
 
 smallLightningElementalInternal :: Int -> Entity
 smallLightningElementalInternal e =

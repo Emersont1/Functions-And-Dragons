@@ -21,5 +21,5 @@ pNeg :: Dice -> Int -> Dice
 pNeg d n = simplify $ fmap (+ n) d
 
 _combs :: [Dice] -> Rolls [Int]
-_combs [] = Rolls [Roll [] (1 % 1)]
+_combs []       = Rolls [Roll [] (1 % 1)]
 _combs (x : xs) = mixFmap (:) x $_combs xs

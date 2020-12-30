@@ -29,10 +29,10 @@ simplify :: (Eq a) => Rolls a -> Rolls a
 simplifyInternal v p f [] =  Roll v p :f
 simplifyInternal v p f s = (addp (head s):f)++tail s
   where addp (Roll v2 p2) = Roll v2 (p+p2)
-  
-simplify (Rolls rs) = Rolls $ foldl' (\rolls (Roll v p) -> let (f, s) = spl v rolls in simplifyInternal v p f s) [] rs 
+
+simplify (Rolls rs) = Rolls $ foldl' (\rolls (Roll v p) -> let (f, s) = spl v rolls in simplifyInternal v p f s) [] rs
   where spl v = break (\(Roll r p) -> r == v)
-        
+
 
 
 mix :: Rolls a -> Rolls b -> Rolls (a, b)
@@ -56,11 +56,11 @@ mixFmap :: (a -> b -> c) -> Rolls a -> Rolls b -> Rolls c
 mixFmap f xs ys = fmap (uncurry f) (mix xs ys)
 
 fmapSimplify :: Eq b => (a -> b) -> Rolls a -> Rolls b
-fmapSimplify g (Rolls rs) = Rolls $ foldl' (\rolls (Roll v p) -> 
+fmapSimplify g (Rolls rs) = Rolls $ foldl' (\rolls (Roll v p) ->
   let h = g v
-      (f, s) = spl h rolls 
-  
-  in simplifyInternal h p f s) [] rs 
+      (f, s) = spl h rolls
+
+  in simplifyInternal h p f s) [] rs
   where spl v = break (\(Roll r p) -> r == v)
 
 -- last 2 functions designed for infinite loop avoidance

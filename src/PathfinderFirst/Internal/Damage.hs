@@ -28,7 +28,7 @@ diceValue (DiceValue n x v) = n`d`x`p`v
 data Damage
   = OneOff
       { damageType :: DamageType,
-        amount :: DiceValue
+        amount     :: DiceValue
       }
 --  | OngoingDamage
 --      { damageType :: DamageType,

@@ -1,20 +1,20 @@
 module PathfinderFirst.Duel where
 
-import Data.Ratio
 import Data.List
+import Data.Ratio
+import Debug.Trace
 import Dice
 import PathfinderFirst.Internal
 import Roll
 import Roll.Internal
-import Debug.Trace
 
 
 data NextMove = First | Second deriving (Eq, Show)
 
-invert First = Second
+invert First  = Second
 invert Second = Second
 
-data DuelState = OngoingDuel Entity Entity NextMove | FWon | FLost | BothDead | Unfinished deriving (Eq, Show) 
+data DuelState = OngoingDuel Entity Entity NextMove | FWon | FLost | BothDead | Unfinished deriving (Eq, Show)
 
 inititiveOrderInternal :: Int -> Int -> Int -> Int -> [NextMove]
 inititiveOrderInternal xinit yinit x y
@@ -42,9 +42,9 @@ duel :: Rolls Entity -> Rolls Entity -> Rolls DuelState
 duel a b = flatten $! fmap (uncurry duelInternal) $mix a b
 
 flipDuel :: DuelState -> DuelState
-flipDuel FWon = FLost
-flipDuel FLost = FWon
-flipDuel BothDead = BothDead
+flipDuel FWon                = FLost
+flipDuel FLost               = FWon
+flipDuel BothDead            = BothDead
 flipDuel (OngoingDuel x y z) = OngoingDuel y x $invert z
 
 attack' :: [Damage] -> Entity -> Rolls Entity
@@ -65,8 +65,8 @@ attackDice at e =
 
 attackRoll :: Attack -> Entity -> AttackResult -> Rolls Entity
 attackRoll at e Crit =  attack' (head (damage at) : damage at) e
-attackRoll at e Hit =  attack' (head (damage at) : damage at) e
-attackRoll _ e _ =  constant e
+attackRoll at e Hit  =  attack' (head (damage at) : damage at) e
+attackRoll _ e _     =  constant e
 
 damageValue :: Attack -> Entity -> Rolls Entity
 damageValue at e = flatten $ fmap (attackRoll at e) (attackDice at e)
@@ -74,8 +74,8 @@ damageValue at e = flatten $ fmap (attackRoll at e) (attackDice at e)
 postAttack :: DuelState -> DuelState
 postAttack (OngoingDuel (Conscious x) (Dead y) s) = FWon
 postAttack (OngoingDuel (Dead x) (Conscious y) s) = FLost
-postAttack (OngoingDuel (Dead x) (Dead y) s) = FLost
-postAttack x = x
+postAttack (OngoingDuel (Dead x) (Dead y) s)      = FLost
+postAttack x                                      = x
 
 stepDuel :: Rolls DuelState -> Rolls DuelState
 stepDuel ds = flatten $! fmap stepDuel' ds
@@ -99,14 +99,14 @@ stepDuel'' x = constant x
 
 lastRound :: DuelState -> DuelState
 lastRound OngoingDuel {} = Unfinished
-lastRound x = x
+lastRound x              = x
 
 findWinner :: Integer -> Rolls DuelState -> Rolls DuelState
 findWinner n duel = fmapSimplify lastRound (findWinner' n duel)
 
 syncopatedStep :: DuelState -> Rolls DuelState
 syncopatedStep (OngoingDuel x y First) = stepDuel' (OngoingDuel x y First)
-syncopatedStep x = constant x
+syncopatedStep x                       = constant x
 
 findWinner' :: Integer -> Rolls DuelState -> Rolls DuelState
 findWinner' x duel = findWinner'' x $! flatten $! fmap syncopatedStep duel

@@ -1,8 +1,8 @@
 module PathfinderFirst.Wolf (wolf, averageWolf) where
 
-import Roll
 import Dice
 import PathfinderFirst.Internal
+import Roll
 
 wolfInternal :: Int -> Entity
 wolfInternal e =
